@@ -27,9 +27,9 @@ EVENT_ENABLE = env_args["EVENT_ENABLE"]
 MONITOR_ENABLE = env_args["MONITOR_ENABLE"]
 TIME_STR = time.strftime("%Y-%m-%d_%H-%M-%S")
 
-print(f"Date_Time: {TIME_STR}")
+print(f"Date_Time: {TIME_STR}\n")
 print(f"Loaded {args['init'].split('/')[-1]}")
-print(env_args)
+print(f"{env_args}\n")
 
 # Pass env varibales to the FPGA_controler script and send setup to the FPGA
 FPGA_controler.init(env_args)
@@ -48,7 +48,7 @@ if EVENT_ENABLE == 1:
     os.makedirs("data/event/", exist_ok=True)
     event_data_file = open(f"data/event/{TIME_STR}.txt", "w")
 
-    print("Starting event mode!\n\n")
+    print("Starting event mode!\n")
     while True:
         event_data = FPGA_controler.event_handler()
         event_data_file.write(TIME_STR)
@@ -64,7 +64,7 @@ if EVENT_ENABLE == 1:
         #   bit_high=bit_high
         # )
 
-        current_time = time.strftime("%H-%M-%S")
+        current_time = time.strftime("%H:%M:%S")
         print ("Timestamp and Event",current_time)   
         print(f"{event_data:032b}")
 
