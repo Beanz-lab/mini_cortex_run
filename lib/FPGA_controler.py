@@ -1,22 +1,31 @@
-# import the main file to access env variables
 import array
-import mini_cortex_run as mcr
+import serial
+
+def init(env_args):
+    global EVENT_ENABLE, MONITOR_ENABLE, MONITOR_PERIOD, FPGA_SER_PATH, PULSE_WIDTH, fpga_ser
+    EVENT_ENABLE = env_args['EVENT_ENABLE']
+    MONITOR_ENABLE = env_args['MONITOR_ENABLE']
+    MONITOR_PERIOD = env_args['MONITOR_PERIOD']
+    FPGA_SER_PATH = env_args['FPGA_SER_PATH']
+    PULSE_WIDTH = 0x06 # env_args['PULSE_WIDTH']
+
+    fpga_ser = serial.Serial(FPGA_SER_PATH,115200, timeout=0)
 
 def tx_setup():
     tx_array = array('B',[]*200)
 
     # Defines the type of data the FPGA will output, monitor (23 bytes) or event mode (8 bytes)
-    tx_array.append(mcr.MONITOR_ENABLE)
-    tx_array.append(mcr.EVENT_ENABLE)
+    tx_array.append(MONITOR_ENABLE)
+    tx_array.append(EVENT_ENABLE)
 
-    tx_array.append(mcr.PULSE_WIDTH)
+    tx_array.append(PULSE_WIDTH)
     tx_array.append(0xFF)
-    tx_array.append(0x000000FF & mcr.MONITOR_PERIOD)                 
-    tx_array.append((0x0000FF00 & mcr.MONITOR_PERIOD)>>8)
-    tx_array.append((0x00FF0000 & mcr.MONITOR_PERIOD)>>16)  
-    tx_array.append((0xFF000000 & mcr.MONITOR_PERIOD)>>24)   
+    tx_array.append(MONITOR_PERIOD)                 
+    tx_array.append((0x0000FF00 & MONITOR_PERIOD)>>8)
+    tx_array.append((0x00FF0000 & MONITOR_PERIOD)>>16)  
+    tx_array.append((0xFF000000 & MONITOR_PERIOD)>>24)   
 
-    mcr.fpga_ser.write(bytes(tx_array))
+    fpga_ser.write(bytes(tx_array))
 
 
   
@@ -24,7 +33,7 @@ mon_array = array('f',[]*50)
 
 def event_handler():
     rx_array = array('B',[]*500)
-    data = mcr.fpga_ser.readline()
+    data = fpga_ser.readline()
     for byte in data:
         rx_array.append(byte)
 
