@@ -1,10 +1,8 @@
 from lib import FPGA_controler
-import serial 
 import json
 import argparse
 import time
-from array import *
-import numpy as np
+import os
 
 # We parse comand line arguments. If mini_cortext.py is executed directly from
 # the comand line, default_init.json will be loaded. If -i is provided with a
@@ -33,12 +31,13 @@ PULSE_WIDTH = 0X06 # env_args["PULSE_WIDTH"]
 TIME_STR = time.strftime("%Y-%m-%d_%H-%M-%S")
 
 print(f"date_time: {TIME_STR}")
-fpga_ser = serial.Serial(FPGA_SER_PATH, 115200, timeout=0)
+FPGA_controler.init(env_args)
 FPGA_controler.tx_setup()
 
 
 if EVENT_ENABLE == 1:
-    event_data_file = open(f"data/event/{TIME_STR}.csv")
+    os.makedirs("data/event/", exist_ok=True)
+    event_data_file = open(f"data/event/{TIME_STR}.csv", "w")
 
     while True:
         event_data = FPGA_controler.event_handler()

@@ -1,4 +1,4 @@
-import array
+from array import *
 import serial
 
 def init(env_args):
@@ -47,3 +47,7 @@ def event_handler():
     if(header == 0xa5a5 and event_tailer == 0xd5d5):
         eve_word = ((rx_array[5] & 0x000000ff) << 24) | ((rx_array[4] & 0x000000ff) << 16) | ((rx_array[3] & 0x000000ff) << 8) | rx_array[2]
         return eve_word
+    
+def monitor_handler():
+    ...
+    return 0
