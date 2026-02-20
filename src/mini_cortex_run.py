@@ -17,28 +17,38 @@ parser.add_argument(
     default="default_init.json"
 )
 
-init_path = vars(parser.parse_args())
+args = vars(parser.parse_args())
 
-with open(init_path["init"]) as f:
+with open(args["init"]) as f:
     env_args = json.load(f)
 
-print(f"loaded {init_path['init'].split('/')[-1]}")
+# Set env variables
 EVENT_ENABLE = env_args["EVENT_ENABLE"]
 MONITOR_ENABLE = env_args["MONITOR_ENABLE"]
-MONITOR_PERIOD = env_args["MONITOR_PERIOD"]
-FPGA_SER_PATH = env_args["FPGA_SER_PATH"]
-PULSE_WIDTH = 0x06 # env_args["PULSE_WIDTH"]
 TIME_STR = time.strftime("%Y-%m-%d_%H-%M-%S")
 
-print(f"date_time: {TIME_STR}")
+print(f"Date_Time: {TIME_STR}")
+print(f"Loaded {args['init'].split('/')[-1]}")
+print(env_args)
+
+# Pass env varibales to the FPGA_controler script and send setup to the FPGA
 FPGA_controler.init(env_args)
 FPGA_controler.tx_setup()
+print("Setup sent to FPGA...")
 
 
+# Event mode body. data is save from the FPGA, currently 32 bits are returned,
+# im not sure why but thats how it is in mdaq_v2.py and mdaq_startup_v2.py. 
+# Should return pixel data from the FPGA which would be 27 bits for 3x3x3 
+# detector.
+#
+# Creates the data file to save data for archiving. Continualy querries the
+# FPGA
 if EVENT_ENABLE == 1:
     os.makedirs("data/event/", exist_ok=True)
-    event_data_file = open(f"data/event/{TIME_STR}.csv", "w")
+    event_data_file = open(f"data/event/{TIME_STR}.txt", "w")
 
+    print("Starting event mode!\n\n")
     while True:
         event_data = FPGA_controler.event_handler()
         event_data_file.write(TIME_STR)
@@ -46,11 +56,17 @@ if EVENT_ENABLE == 1:
         event_data_file.write(f"{event_data:032b}")
         event_data_file.write("\n")
 
-        # send_LED_cube_animate(f"{eve_word:032b}", box_info=box_info, mapping=mapping, bit_low=bit_low, bit_high=bit_high)
-        print ("Timestamp and Event",TIME_STR)   
+        # send_LED_cube_animate(
+        #   f"{eve_word:032b}", 
+        #   box_info=box_info, 
+        #   mapping=mapping, 
+        #   bit_low=bit_low, 
+        #   bit_high=bit_high
+        # )
+
+        current_time = time.strftime("%H-%M-%S")
+        print ("Timestamp and Event",current_time)   
         print(f"{event_data:032b}")
-
-
 
 
 

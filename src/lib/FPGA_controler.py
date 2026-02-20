@@ -12,7 +12,8 @@ def init(env_args):
 
     fpga_ser = serial.Serial(FPGA_SER_PATH,115200, timeout=0)
 
-def tx_setup():
+def tx_setup() -> None:
+    '''Sends a data packet to the FPGA over the USART connection that is used to select mode and set other configurations'''
     tx_array = array('B',[]*200)
 
     # Defines the type of data the FPGA will output, monitor (23 bytes) or event mode (8 bytes)
@@ -29,25 +30,28 @@ def tx_setup():
     fpga_ser.write(bytes(tx_array))
 
 
-def event_handler():
-    rx_array = array('B',[]*500)
-
-    while True:
-        data = fpga_ser.readline()
-        if(len(data) == 8): break
-        time.sleep(0.005)
-    for byte in data:
-        rx_array.append(byte)
-
+def event_handler() -> int:
+    '''Querries the FPGA every 1/200 of a second for data and checks if that data meets requirements for an 'event'. Returns the first data event that it recieves as an integer'''
+    
     # bitwise opperators '<<', '&', and '|' https://www.geeksforgeeks.org/python/python-bitwise-operators/
-    # first byte is same for both trailer byte differs
+    # first byte is same for both, trailer byte differs
+    rx_array = array('B',[]*500)
     header = ((rx_array[1] & 0x00ff) << 8) | (rx_array[0] & 0x00ff)
     event_tailer = ((rx_array[7] & 0x00ff) << 8) | (rx_array[6] & 0x00ff)
 
+    while True:
+        data = fpga_ser.readline()
+        if( len(data)==8 ): break
+        else: time.sleep(0.005)
+
+    for byte in data:
+        rx_array.append(byte)
+
     if(header == 0xa5a5 and event_tailer == 0xd5d5):
         eve_word = ((rx_array[5] & 0x000000ff) << 24) | ((rx_array[4] & 0x000000ff) << 16) | ((rx_array[3] & 0x000000ff) << 8) | rx_array[2]
-    return eve_word
+        return eve_word
     
+
 def monitor_handler():
     mon_array = array('f',[]*50)
     header = ((rx_array[1] & 0x00ff) << 8) | (rx_array[0] & 0x00ff)
