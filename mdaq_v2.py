@@ -4,51 +4,25 @@ latest modified July 22 2018
 latest modified Mar 11 2019
 @author: Yuvaraj
 '''
-# install USB driver from the following link 
-#http://www.dnatechindia.com/ch340g-drivers-download-installation-guide.html
-
-
-# install python2.7
-# install pyserial using following command
-#C:\Python27\Scripts\pip2.7.exe install pyserial
-
-
-# execute : 
-
-    #C:\Python27\python.exe cdaq.py
 
 import serial 
 import time
-import select
-import socket
 import datetime
-import os, sys, signal
 from array import *
-import timeit
-import threading
 import numpy as np
 
-rx_array = array('B',[]*500)  
-time_word_array = array('H',[]*10)  
-tx_array = array('B',[]*200)
-mon_array = array('f',[]*50)
+# General Setup
+## get USB path for the FPGA
+fpga_usb_num = input("Enter USB PORT NO: ")  
+fpga_ser = serial.Serial(f"/dev/ttyUSB{fpga_usb_num}", 115200, timeout=0)
 
-timestr = time.strftime("%Y-%m-%d-%H-%M-%S")
-newname = 'MON_'+timestr+'.txt'
-monfile = open(newname, "w")
+event_enable = int(input("Event mode enable [0, 1]: "))
+mon_enable = int(input("Monitor mode enable [0, 1]: "))
+if mon_enable == event_enable:
+    print("Monitor and event modes cannot be active at the same time")
+    
 
-timestr = time.strftime("%Y-%m-%d-%H-%M-%S")
-newname = 'EVE_'+timestr+'.txt'
-evefile = open(newname, "w")
-
-temp0 = input("Enter USB PORT NO: ")  
-tempx = '/dev/ttyUSB'+temp0
-ser = serial.Serial(tempx, 115200, timeout=0)
-
-temp1 = input("Event Enable: ")
-eve_enable = int(temp1)
-
-if eve_enable == 0:
+if event_enable == 0:
     temp = input("Enter Monitoring Period: ")
     mon_period = int(temp) * 1000000
     temp2 = 1
@@ -58,6 +32,22 @@ else:
     mon_period = 0
     mon_enable = 0
     pulse_width = 0x06
+
+
+timestr = time.strftime("%Y-%m-%d-%H-%M-%S")
+newname = 'MON_'+timestr+'.txt'
+monfile = open(newname, "w")
+
+timestr = time.strftime("%Y-%m-%d-%H-%M-%S")
+newname = 'EVE_'+timestr+'.txt'
+evefile = open(newname, "w")
+
+
+# FPGA Setup
+# rx_array and mon_array used throughout, tx_array only used here
+rx_array = array('B',[]*500)  
+mon_array = array('f',[]*50)
+tx_array = array('B',[]*200)
 
 tx_array.append(mon_enable)
 tx_array.append(eve_enable)
@@ -316,7 +306,6 @@ print("Now Starting")
 while 1:
     #try:
     del rx_array[:]
-    del time_word_array[:]
     del mon_array[:]
 
     data = ser.readline()
