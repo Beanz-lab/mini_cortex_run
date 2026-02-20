@@ -1,4 +1,4 @@
 #! /usr/bin/env bash
 
 cd ~/Documents/mini_cortex_run/
-python3 src/mini_cortex_run.py
+python3.7 src/mini_cortex_run.py
