@@ -43,18 +43,16 @@ print("Setup sent to FPGA...")
 # detector.
 #
 # Creates the data file to save data for archiving. Continualy querries the
-# FPGA
+# FPGA for event data. Saves and displays captured data
 if EVENT_ENABLE == 1:
     os.makedirs("data/event/", exist_ok=True)
-    event_data_file = open(f"data/event/{TIME_STR}.txt", "w")
+    event_data_file = open(f"data/event/{TIME_STR}.csv", "w")
+    event_data_file.write(f"Time,Data\n")
 
     print("Starting event mode!\n")
     while True:
         event_data = FPGA_controler.event_handler()
-        event_data_file.write(TIME_STR)
-        event_data_file.write(" ")
-        event_data_file.write(f"{event_data:032b}")
-        event_data_file.write("\n")
+        event_data_file.write(f"{TIME_STR},{event_data:032b}\n")
 
         # send_LED_cube_animate(
         #   f"{eve_word:032b}", 
