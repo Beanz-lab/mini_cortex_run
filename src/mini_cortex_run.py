@@ -27,7 +27,7 @@ EVENT_ENABLE = env_args["EVENT_ENABLE"]
 MONITOR_ENABLE = env_args["MONITOR_ENABLE"]
 MONITOR_PERIOD = env_args["MONITOR_PERIOD"]
 FPGA_SER_PATH = env_args["FPGA_SER_PATH"]
-PULSE_WIDTH = 0X06 # env_args["PULSE_WIDTH"]
+PULSE_WIDTH = 0x06 # env_args["PULSE_WIDTH"]
 TIME_STR = time.strftime("%Y-%m-%d_%H-%M-%S")
 
 print(f"date_time: {TIME_STR}")
@@ -55,5 +55,6 @@ if EVENT_ENABLE == 1:
 
 
 if MONITOR_ENABLE == 1:
-    monitor_data_file = open(f"data/monitor/{TIME_STR}.csv")
+    os.makedirs("data/monitor/", exist_ok=True)
+    monitor_data_file = open(f"data/monitor/{TIME_STR}.csv", "w")
 
