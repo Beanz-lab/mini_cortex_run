@@ -1,8 +1,8 @@
+from lib import FPGA_controler
 import serial 
 import json
 import argparse
 import time
-import datetime
 from array import *
 import numpy as np
 
@@ -30,9 +30,31 @@ MONITOR_ENABLE = env_args["MONITOR_ENABLE"]
 MONITOR_PERIOD = env_args["MONITOR_PERIOD"]
 FPGA_SER_PATH = env_args["FPGA_SER_PATH"]
 PULSE_WIDTH = 0X06 # env_args["PULSE_WIDTH"]
+TIME_STR = time.strftime("%Y-%m-%d_%H-%M-%S")
 
-timestr = time.strftime("%Y-%m-%d_%H-%M-%S")
-print(f"date_time: {timestr}")
+print(f"date_time: {TIME_STR}")
+fpga_ser = serial.Serial(FPGA_SER_PATH, 115200, timeout=0)
+FPGA_controler.tx_setup()
+
 
 if EVENT_ENABLE == 1:
-    event_data_file = open(f"data/event/{timestr}.csv")
+    event_data_file = open(f"data/event/{TIME_STR}.csv")
+
+    while True:
+        event_data = FPGA_controler.event_handler()
+        event_data_file.write(TIME_STR)
+        event_data_file.write(" ")
+        event_data_file.write(str(event_data_file))
+        event_data_file.write("\n")
+
+        # send_LED_cube_animate(f"{eve_word:032b}", box_info=box_info, mapping=mapping, bit_low=bit_low, bit_high=bit_high)
+        print ("Timestamp and Event",TIME_STR)   
+        print(f"{event_data:032b}")
+
+
+
+
+
+if MONITOR_ENABLE == 1:
+    monitor_data_file = open(f"data/monitor/{TIME_STR}.csv")
+
