@@ -21,7 +21,7 @@ The **source directory** contains all of the code and modules necessary for inte
 
 The **run.sh** script simply sets the appropriate working dir, and calls 'mini_cortex_run.py' without any arguments. Passing no arguments means 'mini_cortex_run.py' will load the **default_init.json** file
 
-The **default_init.json** file contains definitions for environment varialbes used throughout the program. This file is automatically run when 'mini_cortex_run.py' is executed without any arguments. You may load different init.json files if '-i' or '--init' is passed and a path to your custom init.json is provided.
+The **default_init.json** file contains definitions for environment variables used throughout the program. This file is automatically loaded when 'mini_cortex_run.py' is executed without any arguments. You may load different init.json files if '-i' or '--init' is passed and a path to your custom init.json is provided.
 
 ## Starting Run
 
