@@ -43,7 +43,7 @@ if EVENT_ENABLE == 1:
         event_data = FPGA_controler.event_handler()
         event_data_file.write(TIME_STR)
         event_data_file.write(" ")
-        event_data_file.write(str(event_data))
+        event_data_file.write(f"{event_data:032b}")
         event_data_file.write("\n")
 
         # send_LED_cube_animate(f"{eve_word:032b}", box_info=box_info, mapping=mapping, bit_low=bit_low, bit_high=bit_high)
