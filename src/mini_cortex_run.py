@@ -25,7 +25,7 @@ with open(args["init"]) as f:
 # Set env variables
 EVENT_ENABLE = env_args["EVENT_ENABLE"]
 MONITOR_ENABLE = env_args["MONITOR_ENABLE"]
-TIME_STR = time.strftime("%Y-%m-%d_%H-%M-%S")
+TIME_STR = time.strftime("%Y-%m-%d_%H:%M:%S")
 
 print(f"Date_Time: {TIME_STR}\n")
 print(f"Loaded {args['init'].split('/')[-1]}")
@@ -52,7 +52,8 @@ if EVENT_ENABLE == 1:
     print("Starting event mode!\n")
     while True:
         event_data = FPGA_controler.event_handler()
-        event_data_file.write(f"{TIME_STR},{event_data:032b}\n")
+        event_time = time.strftime("%y-%m-%d_%H:%M:%S")
+        event_data_file.write(f"{event_time},{event_data:032b}\n")
 
         # send_LED_cube_animate(
         #   f"{eve_word:032b}", 
@@ -62,8 +63,7 @@ if EVENT_ENABLE == 1:
         #   bit_high=bit_high
         # )
 
-        current_time = time.strftime("%H:%M:%S")
-        print ("Timestamp and Event",current_time)   
+        print ("Timestamp and Event",event_time.split("_")[-1])   
         print(f"{event_data:032b}")
 
 
@@ -71,4 +71,10 @@ if EVENT_ENABLE == 1:
 if MONITOR_ENABLE == 1:
     os.makedirs("data/monitor/", exist_ok=True)
     monitor_data_file = open(f"data/monitor/{TIME_STR}.csv", "w")
+    monitor_data_file.write(f"Time,Data\n")
 
+    print("Starting monitor mode!\n")
+    while True:
+        monitor_data = FPGA_controler.monitor_handler()
+        monitor_time = time.strftime("%y-%m-%d_%H:%M:%S")
+        monitor_data_file.write(f"{monitor_time},{str(monitor_data)}\n")
