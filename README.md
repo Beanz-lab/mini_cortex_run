@@ -2,7 +2,7 @@
 
 ## About Run
 
-Run is a set of tools for iniializing and opperating the Mini CoRTEx
+Run is a set of tools for initializing and opperating the Mini CoRTEx
 
 ## About Mini CoRTEx
 
